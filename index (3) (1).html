@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>iPlace — Semanas 3 e 4 | Papa PPG</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #F5F3EF;
+      --surface: #FFFFFF;
+      --ink: #1A1A18;
+      --ink-light: #6B6B65;
+      --border: #E0DDD7;
+      --radius: 12px;
+    }
+
+    body { 
+      font-family: 'DM Sans', sans-serif; 
+      background: var(--bg); 
+      color: var(--ink); 
+      min-height: 100vh;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* TOPBAR — tipo o aprovador */
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(245, 243, 239, 0.94);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 20px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .topbar-left {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .topbar-brand {
+      font-size: 0.68rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      color: var(--ink-light);
+      text-transform: uppercase;
+    }
+
+    .topbar-title {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.2rem;
+      font-weight: 400;
+      color: var(--ink);
+    }
+
+    .topbar-subtitle {
+      font-size: 0.75rem;
+      color: var(--ink-light);
+      letter-spacing: 0.04em;
+    }
+
+    .container {
+      max-width: 500px;
+      margin: 0 auto;
+      padding: 48px 24px;
+    }
+
+    #posts-container {
+      display: flex;
+      flex-direction: column;
+      gap: 48px;
+      margin-bottom: 60px;
+    }
+
+    .post-card {
+      background: var(--surface);
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 4px 40px rgba(0,0,0,0.06);
+      border: 1.5px solid var(--border);
+      animation: fadeUp 0.4s ease both;
+    }
+
+    @keyframes fadeUp { 
+      from { opacity: 0; transform: translateY(16px); } 
+      to { opacity: 1; transform: translateY(0); } 
+    }
+
+    .carousel-image-container {
+      position: relative;
+      background: #F0EEE9;
+      aspect-ratio: 4 / 5;
+      overflow: hidden;
+    }
+
+    .carousel-image-container img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      position: absolute;
+      top: 0; left: 0;
+    }
+
+    .carousel-image-container iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      position: absolute;
+      top: 0; left: 0;
+    }
+
+    .nav-button {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(26, 26, 24, 0.5);
+      border: none;
+      color: white;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      font-size: 24px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s;
+      z-index: 10;
+    }
+
+    .nav-button:hover {
+      background: rgba(26, 26, 24, 0.7);
+    }
+
+    .nav-button.prev {
+      left: 12px;
+    }
+
+    .nav-button.next {
+      right: 12px;
+    }
+
+    .indicators {
+      position: absolute;
+      bottom: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 6px;
+      z-index: 10;
+    }
+
+    .indicator {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.4);
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .indicator.active {
+      background: rgba(255, 255, 255, 0.9);
+    }
+
+    .week-badge {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      background: rgba(26, 26, 24, 0.75);
+      color: white;
+      font-size: 0.72rem;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 99px;
+      backdrop-filter: blur(4px);
+      z-index: 10;
+    }
+
+    .carousel-body {
+      padding: 24px 28px;
+    }
+
+    .legenda {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.1rem;
+      color: var(--ink);
+      margin-bottom: 12px;
+      line-height: 1.3;
+    }
+
+    .descricao {
+      font-size: 0.85rem;
+      color: var(--ink-light);
+      line-height: 1.6;
+      margin-bottom: 16px;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .counter {
+      font-size: 0.78rem;
+      color: var(--ink-light);
+      background: var(--bg);
+      padding: 4px 12px;
+      border-radius: var(--radius);
+      display: inline-block;
+      margin-bottom: 20px;
+      border-top: 1px solid var(--border);
+      padding-top: 16px;
+    }
+
+    .comments-section {
+      border-top: 1px solid var(--border);
+      padding-top: 20px;
+    }
+
+    .comments-label {
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--ink-light);
+      margin-bottom: 12px;
+      display: block;
+    }
+
+    .comments-textarea {
+      width: 100%;
+      min-height: 80px;
+      padding: 12px 14px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.88rem;
+      color: var(--ink);
+      background: var(--bg);
+      resize: vertical;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .comments-textarea:focus {
+      border-color: var(--ink);
+    }
+
+    .comments-textarea::placeholder {
+      color: var(--ink-light);
+    }
+
+    @media (max-width: 600px) {
+      body { padding: 20px 16px; }
+      .header { margin-bottom: 32px; }
+      .header h1 { font-size: 1.4rem; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-left">
+    <span class="topbar-brand">Papa PPG</span>
+    <span class="topbar-title">iPlace × Apple</span>
+    <span class="topbar-subtitle">Semanas 3 e 4</span>
+  </div>
+</div>
+
+<div class="container">
+  <div id="posts-container"></div>
+</div>
+
+<script>
+  // ============================================================
+  // CUSTOMIZE AQUI: Posts das semanas 3 e 4
+  // ============================================================
+  // Cada post pode ter múltiplas imagens (carrossel automático)
+  
+  const posts = [
+  {
+    numero: 1,
+    week: 3,
+    legenda: '3 métricas do apple watch',
+    descricao: `Você está treinando com inteligência ou apenas suando a camisa? 🏃💨
+
+O que realmente importa para a sua evolução física é entender como o seu corpo responde a cada esforço. E o Apple Watch entrega um resumo completo da sua evolução.
+
+Quando você acompanha as métricas certas, seu treino deixa de ser um mero esforço e se torna o aliado da sua evolução.
+
+Arraste para o lado e entenda como usar essas 3 métricas fundamentais para alcançar seus objetivos mais rápido.
+
+👉 Toque no link da bio e encontre o dispositivo ideal para acompanhar seus próximos treinos.`,
+    imagens: [
+      'https://drive.google.com/uc?export=view&id=1M5ADlonYWT_096ZJH07eY_AA0zcUH-cg',
+      'https://drive.google.com/uc?export=view&id=1q9yUjDFWyCM1hKb16dpahGPxocEKGaYG',
+      'https://drive.google.com/uc?export=view&id=1geMhWVRlWUVJTWw_m1-T4QHE5vDJdORS',
+      'https://drive.google.com/uc?export=view&id=10hXDn6-eRIlk6ES3sZG83-j8Ewosx0Rk',
+      'https://drive.google.com/uc?export=view&id=1b4iKCO1mDtk-V9EA_jhoHnG2iGRu3FI2',
+      'https://drive.google.com/uc?export=view&id=19UqMH97YMgXMmdvHH1xrf-YBbgvL8jKj',
+      'https://drive.google.com/uc?export=view&id=1H5jzZ84Sgbescj_jqulWVLkMTVcmg6jq'
+    ]
+  },
+  {
+    numero: 2,
+    week: 3,
+    legenda: 'Frequência Cardíaca',
+    descricao: `O seu Apple Watch avisou e bateu aquela dúvida? 🤔
+
+Os dados de frequência cardíaca ajudam a entender o ritmo do seu corpo em cada momento – do treino intenso ao descanso no sofá.
+
+Arraste para o lado e descubra como diferenciar um batimento normal de um sinal que merece a sua atenção.
+
+E não se esqueça: o Apple Watch é uma ferramenta poderosa de bem-estar, mas acompanhamento médico especializado é insubstituível.
+
+👉 Toque no link da bio e escolha o modelo ideal.`,
+    imagens: [
+      'https://drive.google.com/uc?export=view&id=1LNC3WOoA7e8dKkyjj2P2Jp_0Yfw3HxG5',
+      'https://drive.google.com/uc?export=view&id=19mlP4qOefiqdzBuevGwqLBlbKaNbJ5__',
+      'https://drive.google.com/uc?export=view&id=1QmxiZzUp3Rk0IEZFE82oF_gJ7AEt8eWa',
+      'https://drive.google.com/uc?export=view&id=1tulTqJvDnK4asaacoCb416AeyvY0YPux',
+      'https://drive.google.com/uc?export=view&id=10ljBpRI6Xdsjo9apC4yo83tqSU6IZ2s4',
+      'https://drive.google.com/uc?export=view&id=1hZWtp_Vko-CuTKe87t0s1s1bQC5i1u_k',
+      'https://drive.google.com/uc?export=view&id=1-b5rwMuljeq-WVgoKhSOyNYeMOR_weA3',
+      'https://drive.google.com/uc?export=view&id=1tRe5qmH7MObPBPoKiCIkpGHjtxyZLJX7'
+    ]
+  },
+  {
+    numero: 3,
+    week: 3,
+    legenda: 'Trocaria seu notebook pelo iPad Pro?',
+    descricao: `Você já percebeu que muita gente não leva mais notebook para todo lugar? 👀
+
+O iPad Pro M5 é um dos grandes responsáveis por essa mudança.
+
+Afinal, ele oferece potência de sobra para trabalhar com Office 365, editar vídeos em 4K, criar projetos, organizar reuniões, responder as mais diferentes demandas e ainda funcionar como um tablet ultrafino sempre que você precisar de máxima mobilidade.
+
+👉 Arraste e entenda por que o iPad Pro M5 está tomando o lugar de muitos notebooks.
+
+Depois, passe na iPlace e encontre o seu próximo companheiro de trabalho!`,
+    imagens: [
+      'https://drive.google.com/uc?export=view&id=1_IRaLz_ev1Gzqnnz2V5MZ_d3_sg7ian3',
+      'https://drive.google.com/uc?export=view&id=15eNzLOByJjuW_snX8UY3MGcMy784mrVC',
+      'https://drive.google.com/uc?export=view&id=10tm04z5QvgOejBLRPLXwa5f0wU0DV6_L',
+      'https://drive.google.com/uc?export=view&id=1ONMBiDd-spjq-HLjplz0cV-w7uSXME1r',
+      'https://drive.google.com/uc?export=view&id=1V-6FsnJzy-rmUZBxZpNc0kc4vRwLEcqs',
+      'https://drive.google.com/uc?export=view&id=1ujnXumZ32JRqPgMqjHIokcco_4F_EDjN',
+      'https://drive.google.com/uc?export=view&id=1Mrh42Z_3yEfCf0qN0u_thO-O4Z6vligi',
+      'https://drive.google.com/uc?export=view&id=1Yl61eT5pzuPmNNRmfxYQWWjyQMJX05hu'
+    ]
+  },
+  {
+    numero: 4,
+    week: 4,
+    legenda: 'Como fotografar a Lua',
+    descricao: `Você já fotografou uma cena incrível e se perguntou por que a foto não ficou nem perto do que seus olhos estavam vendo?
+
+Calma, acontece com todo mundo.
+
+A boa notícia é que, na maioria das vezes, o problema não está na câmera, mas em pequenos ajustes que quase ninguém aprende a fazer.
+
+👉 Arraste para o lado e descubra como aproveitar melhor os recursos que já existem no iPhone.
+
+Ah! E se você quer explorar todo esse potencial, passe na iPlace e conheça os modelos de iPhone disponíveis!`,
+    imagens: [
+      'https://drive.google.com/uc?export=view&id=1ikzXWm5uvt7fGIBTofo1SukUcIhCpG9Q',
+      'https://drive.google.com/uc?export=view&id=18ONloayvLOroWPrL3A_AU3jBOeIMhP-6',
+      'https://drive.google.com/uc?export=view&id=1Mbkwf-UdzJx2f9aHnevXDpWf-jUIuOUI',
+      'https://drive.google.com/uc?export=view&id=1QtPpTx-HuiUmhDP-IA4zmw8BxJNxb-CN',
+      'https://drive.google.com/uc?export=view&id=1QXwUJtPeFrOonHiUgiLAnZLBDhgNtSA5',
+      'https://drive.google.com/uc?export=view&id=1AEa208InbcynObDdZ34cOHklOPYcqR-E',
+      'https://drive.google.com/uc?export=view&id=1KQfdfnJpy6r7ZATssj_Qtwq9OFEPnXkU',
+      'https://drive.google.com/uc?export=view&id=1UdM_kBiVWAorswistM9dDX1MesIIIZGf',
+      'https://drive.google.com/uc?export=view&id=1n5yX4wNwTV5pl2-S8v5FO93dGWHVZLCP'
+    ]
+  },
+  {
+    numero: 5,
+    week: 4,
+    legenda: 'Ela não virou atleta...',
+    descricao: `Nem todo mundo usa o Apple Watch para bater recordes ou correr maratonas. Muitas vezes, o dispositivo ajuda em coisas bem mais simples – porém, igualmente importantes:
+
+👉 Perceber quando o sono não foi suficiente.
+👉 Entender sinais de estresse.
+👉 Observar o próprio ritmo antes que o corpo precise gritar por atenção.
+
+Quer saber mais? Passe para o lado e nos conte se você se identifica com essa história.
+
+Depois, visite a iPlace e conheça os modelos de Apple Watch que mais combinam com a sua rotina.`,
+    imagens: [
+      'https://drive.google.com/uc?export=view&id=1lgJI8wfMWMF5zOgPWRPcwLmhA280dK66',
+      'https://drive.google.com/uc?export=view&id=1IaRU5GOsYXRhr43cRTWh_jGEvZd32BL_',
+      'https://drive.google.com/uc?export=view&id=1krPsjtk5FuZclEANXAJwG-Q_TlqmJ5pd',
+      'https://drive.google.com/uc?export=view&id=1eR6OEo5iTeFRxmmvX_rIGHXrb1Rekupj',
+      'https://drive.google.com/uc?export=view&id=1H8kn1FFqjSgu5_TkcS8rlqvkVvPgUQg1',
+      'https://drive.google.com/uc?export=view&id=1GdzIP256bw_9wS8BiqFZan_JeBqqee3V',
+      'https://drive.google.com/uc?export=view&id=1qVEkEbAmcCq2HOW7WHq6SCN78e0r1gE0',
+      'https://drive.google.com/uc?export=view&id=1MfiAQ5f8j8l1aF1H8OGG0o2ppG3tUPEl',
+      'https://drive.google.com/uc?export=view&id=19k4Nkdp33Ujw85wVEaybbZb3Dve8XLsB'
+    ]
+  },
+  {
+    numero: 6,
+    week: 4,
+    legenda: 'iPad + Apple Pencil',
+    descricao: `Nem todo mundo realmente precisa de um Apple Pencil. Mas, para algumas pessoas, o acessório muda completamente a experiência de usar o iPad.
+
+✅ Quem desenha percebe isso desde o primeiro traço.
+✅ Quem faz muitas anotações sente a facilidade no dia a dia.
+✅ E quem trabalha com documentos, criação ou projetos entende rapidamente como esse acessório deixa tudo mais prático.
+
+👉 Arraste e descubra o quanto essa dupla combina com a sua rotina.
+
+Ah! Se ficar qualquer dúvida sobre compatibilidade, a equipe da iPlace ajuda você a encontrar o modelo certo. 😉`,
+    imagens: [
+      'https://drive.google.com/uc?export=view&id=1NBifRQoCeMRpvN6k7yJPzNBSWLUSp00y',
+      'https://drive.google.com/uc?export=view&id=1LiEsnXu42TRpIf_ddGE5e6pLPGAjR1WK',
+      'https://drive.google.com/uc?export=view&id=1TilRu1RRh-XOkPEY3mwTPUhmWSxaTIgX',
+      'https://drive.google.com/uc?export=view&id=1Hy50yWnOwa5ITbB7K2unI-nEZxqmTR2Z',
+      'https://drive.google.com/uc?export=view&id=1faWTyiaNPZ5CH7q3Yva2Cuy2pKU-3RIM',
+      'https://drive.google.com/uc?export=view&id=1bRfFokCUhFBPzlX1I6kVwhVcZo2WsatV',
+      'https://drive.google.com/uc?export=view&id=13YSjY3Xhf0Bo3_Wm7xTBV0Wf1-E3hPoY',
+      'https://drive.google.com/uc?export=view&id=15xHw0NhGzp2ah6UDxp29GjQwweE4TPly',
+      'https://drive.google.com/uc?export=view&id=1V3M-xKsq4Rmc2UPG1FzTPZ_kgcwU6bt4'
+    ]
+  },
+  {
+    numero: 7,
+    week: 4,
+    legenda: 'iPhone 17 Pro',
+    descricao: `A câmera do iPhone 17 Pro evoluiu nos detalhes que realmente fazem diferença no dia a dia.
+
+Fotos noturnas mais nítidas, zoom com muito mais alcance, selfies melhor enquadradas e vídeos com qualidade ainda mais profissional. 📸
+
+Agora, a experiência ficou mais fluida, natural e prática para quem gosta de registrar momentos com qualidade.
+
+👉 Deslize e entenda o que mudou nas câmeras do novo iPhone 17 Pro. Depois, encontre o seu na iPlace.`,
+    imagens: [
+      'https://drive.google.com/uc?export=view&id=1idtg3qUQuyE1DKc7SPAXIDW7I88ueAZ-',
+      'https://drive.google.com/uc?export=view&id=1VyLzxvttNtiF50uO_kxJB_lx7rfsG9Xb',
+      'https://drive.google.com/uc?export=view&id=1azbgmrU5fN85CEzAWEnsafL9Ei-GhCHb',
+      'https://drive.google.com/uc?export=view&id=1rFmZKTRS8sQNDIxleX_gzlukgsLJH32C',
+      'https://drive.google.com/uc?export=view&id=1KhfTKvjJ7KbnhPgpmVIrUYgkxANlrPqt',
+      'https://drive.google.com/uc?export=view&id=1NpnaWXSHny-zuv7V9Y917aMPNppQ3vKZ',
+      'https://drive.google.com/uc?export=view&id=18LYNMh_mBy2texh2IvcbWDJ2-_BsDlHd',
+      'https://drive.google.com/uc?export=view&id=1Vvm5MgCJSQ9iJ1dhnsEsQXA1DZDZDaI5',
+      'https://drive.google.com/uc?export=view&id=13IyrzHkWLHkyUX_Lm3Ru2Ydiak11k2oC'
+    ]
+  }
+];
+
+  // IDs que são vídeos (identificados pelo #video no link original)
+  const videoIds = new Set([
+    '1b4iKCO1mDtk-V9EA_jhoHnG2iGRu3FI2', // post 1 - 3 métricas
+    '1hZWtp_Vko-CuTKe87t0s1s1bQC5i1u_k',  // post 2 - frequência cardíaca
+    '1QtPpTx-HuiUmhDP-IA4zmw8BxJNxb-CN',  // post 4 - fotografar a lua
+    '1LiEsnXu42TRpIf_ddGE5e6pLPGAjR1WK',  // post 6 - ipad + apple pencil
+    '1VyLzxvttNtiF50uO_kxJB_lx7rfsG9Xb',  // post 7 - iphone 17 pro
+    '1KhfTKvjJ7KbnhPgpmVIrUYgkxANlrPqt',  // post 7 - iphone 17 pro
+  ]);
+
+  function getFileId(url) {
+    const match = url.match(/id=([^&]+)/);
+    return match ? match[1] : null;
+  }
+
+  function isVideo(url) {
+    const id = getFileId(url);
+    return id && videoIds.has(id);
+  }
+
+  function getThumbUrl(url) {
+    const id = getFileId(url);
+    // lh3.googleusercontent.com/d/ID é o CDN nativo do Google Drive, sem CORS
+    return `https://lh3.googleusercontent.com/d/${id}`;
+  }
+
+  function getEmbedUrl(url) {
+    const id = getFileId(url);
+    return `https://drive.google.com/file/d/${id}/preview`;
+  }
+
+  // Estado dos carrosséis
+  const carouselStates = {};
+
+  // Inicializar
+  function init() {
+    const container = document.getElementById('posts-container');
+    
+    posts.forEach((post, idx) => {
+      carouselStates[idx] = 0;
+      container.appendChild(createPostCard(post, idx));
+    });
+  }
+
+  // Criar elemento de mídia (imagem ou vídeo)
+  function createMediaElement(url, postIdx) {
+    if (isVideo(url)) {
+      const iframe = document.createElement('iframe');
+      iframe.src = getEmbedUrl(url);
+      iframe.style.cssText = 'width:100%;height:100%;border:none;position:absolute;top:0;left:0;';
+      iframe.allow = 'autoplay';
+      iframe.allowFullscreen = true;
+      return iframe;
+    } else {
+      const img = document.createElement('img');
+      img.src = getThumbUrl(url);
+      img.alt = `Post ${postIdx + 1}`;
+      img.style.cssText = 'width:100%;height:100%;object-fit:cover;display:block;';
+      return img;
+    }
+  }
+
+  // Criar card de post com carrossel
+  function createPostCard(post, postIdx) {
+    const card = document.createElement('div');
+    card.className = 'post-card';
+    
+    const imageCount = post.imagens.length;
+    const isCarousel = imageCount > 1;
+
+    // Container da mídia
+    const mediaContainer = document.createElement('div');
+    mediaContainer.className = 'carousel-image-container';
+    mediaContainer.style.position = 'relative';
+
+    // Elemento de mídia inicial
+    const mediaEl = createMediaElement(post.imagens[0], postIdx);
+    mediaEl.id = `media-${postIdx}`;
+    mediaContainer.appendChild(mediaEl);
+
+    // Badge de semana
+    const badge = document.createElement('span');
+    badge.className = 'week-badge';
+    badge.textContent = `Semana ${post.week}`;
+    mediaContainer.appendChild(badge);
+
+    if (isCarousel) {
+      const prevBtn = document.createElement('button');
+      prevBtn.className = 'nav-button prev';
+      prevBtn.innerHTML = '‹';
+      prevBtn.onclick = () => prevImage(postIdx);
+      mediaContainer.appendChild(prevBtn);
+
+      const nextBtn = document.createElement('button');
+      nextBtn.className = 'nav-button next';
+      nextBtn.innerHTML = '›';
+      nextBtn.onclick = () => nextImage(postIdx);
+      mediaContainer.appendChild(nextBtn);
+
+      const indicators = document.createElement('div');
+      indicators.className = 'indicators';
+      indicators.id = `indicators-${postIdx}`;
+      post.imagens.forEach((_, i) => {
+        const dot = document.createElement('button');
+        dot.className = 'indicator' + (i === 0 ? ' active' : '');
+        dot.onclick = () => goToImage(postIdx, i);
+        // Show video icon on video slides
+        if (isVideo(post.imagens[i])) {
+          dot.style.background = i === 0 ? 'rgba(255,200,50,0.9)' : 'rgba(255,200,50,0.4)';
+        }
+        indicators.appendChild(dot);
+      });
+      mediaContainer.appendChild(indicators);
+    }
+
+    card.appendChild(mediaContainer);
+
+    // Body
+    const body = document.createElement('div');
+    body.className = 'carousel-body';
+    body.innerHTML = `
+      <div class="legenda">${post.legenda}</div>
+      <div class="descricao">${post.descricao}</div>
+      ${isCarousel ? `<div class="counter"><span>${imageCount} artes</span></div>` : ''}
+      <div class="comments-section">
+        <label class="comments-label">Anotações</label>
+        <textarea class="comments-textarea" id="comments-${postIdx}" placeholder="Deixe seus comentários ou feedback..."></textarea>
+      </div>
+    `;
+    card.appendChild(body);
+
+    return card;
+  }
+
+  // Navegação de imagens
+  function nextImage(postIdx) {
+    const post = posts[postIdx];
+    carouselStates[postIdx] = (carouselStates[postIdx] + 1) % post.imagens.length;
+    updateCarousel(postIdx);
+  }
+
+  function prevImage(postIdx) {
+    const post = posts[postIdx];
+    carouselStates[postIdx] = (carouselStates[postIdx] - 1 + post.imagens.length) % post.imagens.length;
+    updateCarousel(postIdx);
+  }
+
+  function goToImage(postIdx, imgIdx) {
+    carouselStates[postIdx] = imgIdx;
+    updateCarousel(postIdx);
+  }
+
+  function updateCarousel(postIdx) {
+    const post = posts[postIdx];
+    const currentIdx = carouselStates[postIdx];
+    const url = post.imagens[currentIdx];
+    const container = document.getElementById(`media-${postIdx}`).parentNode;
+
+    // Remove old media element
+    const old = document.getElementById(`media-${postIdx}`);
+    if (old) old.remove();
+
+    // Create new media element
+    const newMedia = createMediaElement(url, postIdx);
+    newMedia.id = `media-${postIdx}`;
+
+    // Insert before the badge (first child)
+    container.insertBefore(newMedia, container.firstChild);
+
+    // Update indicators
+    const indicators = document.querySelectorAll(`#indicators-${postIdx} .indicator`);
+    indicators.forEach((ind, i) => {
+      ind.classList.toggle('active', i === currentIdx);
+      if (isVideo(post.imagens[i])) {
+        ind.style.background = i === currentIdx ? 'rgba(255,200,50,0.9)' : 'rgba(255,200,50,0.4)';
+      } else {
+        ind.style.background = '';
+      }
+    });
+  }
+
+  // Inicializar ao carregar
+  init();
+</script>
+
+</body>
+</html>
